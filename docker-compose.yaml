@@ -1,0 +1,71 @@
+version: '3.8'
+
+# Comment: This file uses best practices: pinned versions,
+# environment variables for secrets, and health checks for reliable startup.
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.0 # Version pinned for stability
+    container_name: claude-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:11.0.0 # Version pinned
+    container_name: claude-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      # Credentials loaded from .env file for security
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-provisioning:/etc/grafana/provisioning
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_healthy # Waits until Prometheus is fully ready
+
+  # Optional service for collecting host system metrics
+  node-exporter:
+    image: prom/node-exporter:v1.8.1 # Version pinned
+    container_name: claude-node-exporter
+    # Port 9100 is not published since it's only needed by Prometheus inside the network
+    # ports:
+    #   - "9100:9100"
+    restart: unless-stopped
+    # 'privileged: true' is required for access to host filesystems
+    # to avoid 'permission denied' errors.
+    # This is safe for local development but requires risk assessment in production.
+    privileged: true
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+# Named volumes for persistent storage of Prometheus and Grafana data
+volumes:
+  prometheus-data: {}
+  grafana-data: {}

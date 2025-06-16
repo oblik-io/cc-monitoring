@@ -1,0 +1,11 @@
+# claude-code-monitoring/grafana-provisioning/datasources/prometheus.yml.template
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    # This placeholder will be replaced by the manage.sh script
+    url: http://localhost:9090
+    isDefault: true
+    editable: true

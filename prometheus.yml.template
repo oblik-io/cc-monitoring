@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Scrape Claude Code metrics from the Prometheus exporter
+  - job_name: 'claude-code'
+    static_configs:
+      # This placeholder will be automatically replaced by the manage.sh script
+      - targets: ['CLAUDE_CODE_EXPORTER_HOST:9464']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Scrape Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scrape node exporter for system metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100'] # In Podman/Docker mode we access via localhost

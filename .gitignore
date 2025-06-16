@@ -1,0 +1,64 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# Docker volumes (local data)
+prometheus-data/
+grafana-data/
+
+# Temporary files
+*.tmp
+*.temp
+
+# AI
+CLAUDE.md
+.bmad-code/
+.claude/
+# AI model files
+# (if you have specific AI model files, you can add them here)
+# Build artifacts
+dist/
+# Node modules
+node_modules/
+# Python cache
+__pycache__/
+# Python virtual environments
+venv/
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Coverage reports
+coverage/
+# Test output
+*.test.js
+# Build directories
+build/
+# Documentation build directories
+docs/_build/
+# IDE specific files
+*.iml
+# Python bytecode files
+*.pyc
+# Backup files
+*.bak
+# Miscellaneous
+*.orig
+# System files
+*.swp
+# Logs and databases
+*.log
+# Miscellaneous
+*.tmp
