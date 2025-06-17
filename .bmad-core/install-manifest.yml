@@ -1,13 +1,21 @@
 {
-  "version": "4.4.0",
-  "installed_at": "2025-06-16T16:46:41.642Z",
+  "version": "4.4.2",
+  "installed_at": "2025-06-17T05:42:35.293Z",
   "install_type": "full",
   "agent": null,
   "ide_setup": null,
-  "ides_setup": [
-    "claude-code"
-  ],
+  "ides_setup": [],
   "files": [
+    {
+      "path": ".bmad-core/install-manifest.yml.bak",
+      "hash": "b5feec87bca596bd",
+      "modified": false
+    },
+    {
+      "path": ".bmad-core/install-manifest.yml",
+      "hash": "b5feec87bca596bd",
+      "modified": false
+    },
     {
       "path": ".bmad-core/bmad-core-config.yml",
       "hash": "82ed4160979472f0",
@@ -110,7 +118,7 @@
     },
     {
       "path": ".bmad-core/utils/workflow-management.md",
-      "hash": "fa906e4b7ec97f4e",
+      "hash": "685674c3db2b2a6a",
       "modified": false
     },
     {
@@ -120,7 +128,7 @@
     },
     {
       "path": ".bmad-core/utils/agent-switcher.ide.md",
-      "hash": "d279f8bfcc11ba53",
+      "hash": "2baf9af8ca4916c9",
       "modified": false
     },
     {
@@ -155,12 +163,12 @@
     },
     {
       "path": ".bmad-core/templates/fullstack-architecture-tmpl.md",
-      "hash": "00ce9435f992dd1f",
+      "hash": "ca50b8528eb7d0b1",
       "modified": false
     },
     {
       "path": ".bmad-core/templates/front-end-spec-tmpl.md",
-      "hash": "c391aabce180981e",
+      "hash": "e5bd34d9c39275c6",
       "modified": false
     },
     {
@@ -185,12 +193,12 @@
     },
     {
       "path": ".bmad-core/templates/brownfield-architecture-tmpl.md",
-      "hash": "004ecaba8f46191a",
+      "hash": "58730bc719b6107e",
       "modified": false
     },
     {
       "path": ".bmad-core/templates/architecture-tmpl.md",
-      "hash": "bb8459f4247d863f",
+      "hash": "5706c49f3456072e",
       "modified": false
     },
     {
@@ -200,7 +208,7 @@
     },
     {
       "path": ".bmad-core/tasks/shard-doc.md",
-      "hash": "bf68bd6c69da43b5",
+      "hash": "90792a744f36b8f6",
       "modified": false
     },
     {
@@ -315,17 +323,17 @@
     },
     {
       "path": ".bmad-core/agents/ux-expert.md",
-      "hash": "fce62fd8bd3967c2",
+      "hash": "63342cea2d315828",
       "modified": false
     },
     {
       "path": ".bmad-core/agents/sm.md",
-      "hash": "e14444b32c11a232",
+      "hash": "35c6e6d486b38c14",
       "modified": false
     },
     {
       "path": ".bmad-core/agents/qa.md",
-      "hash": "3a593e48262bacad",
+      "hash": "e07de7e0950f28f3",
       "modified": false
     },
     {
@@ -345,7 +353,7 @@
     },
     {
       "path": ".bmad-core/agents/bmad-orchestrator.md",
-      "hash": "682a2627af4bcf65",
+      "hash": "ccd8f0b9f4573044",
       "modified": false
     },
     {
@@ -365,17 +373,22 @@
     },
     {
       "path": ".bmad-core/agent-teams/team-no-ui.yml",
-      "hash": "d7502af90474eb1b",
+      "hash": "db791eaa9b060ad3",
+      "modified": false
+    },
+    {
+      "path": ".bmad-core/agent-teams/team-ide-minimal.yml",
+      "hash": "600b6795116fd74e",
       "modified": false
     },
     {
       "path": ".bmad-core/agent-teams/team-fullstack.yml",
-      "hash": "cee5d81d0d9913e2",
+      "hash": "8adda579fff343cd",
       "modified": false
     },
     {
       "path": ".bmad-core/agent-teams/team-all.yml",
-      "hash": "e6b9827f3e0e0528",
+      "hash": "788067c0fd19c76d",
       "modified": false
     }
   ]

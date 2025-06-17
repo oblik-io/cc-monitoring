@@ -341,7 +341,7 @@ Use YAML format for better readability. If no REST API, skip this section.]]
 
 ^^CONDITION: has_rest_api^^
 
-````yaml
+```yaml
 openapi: 3.0.0
 info:
   title:
@@ -418,7 +418,7 @@ After presenting the structure, apply `tasks#advanced-elicitation` protocol to r
 ├── {{package-manifest}}        # Dependencies manifest
 ├── {{config-files}}            # Language/framework configs
 └── README.md                   # Project documentation
-````
+```text
 
 @{example: monorepo-structure}
 project-root/

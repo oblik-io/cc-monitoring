@@ -506,7 +506,7 @@ After presenting this section, apply `tasks#advanced-elicitation` protocol]]
 
 **Route Organization:**
 
-`````text
+```text
 {{route_structure}}
 ```text
 
@@ -532,7 +532,7 @@ After presenting this section, apply `tasks#advanced-elicitation` protocol]]
     api_client_setup;
   }
 }
-`````
+````
 
 **Service Example:**
 
