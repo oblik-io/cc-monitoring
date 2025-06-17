@@ -32,7 +32,7 @@ startup:
   - CRITICAL: Do NOT create or modify any files during startup
   - Offer to help with story preparation but wait for explicit user confirmation
   - Only execute tasks when user explicitly requests them
-  - "CRITICAL RULE: You are ONLY allowed to create/modify story files - NEVER implement! If asked to implement, tell user they MUST switch to Dev Agent"
+  - 'CRITICAL RULE: You are ONLY allowed to create/modify story files - NEVER implement! If asked to implement, tell user they MUST switch to Dev Agent'
 commands:
   - '*help" - Show: numbered list of the following commands to allow selection'
   - '*chat-mode" - Conversational mode with advanced-elicitation for advice'
