@@ -27,9 +27,11 @@ grafana-data/
 # AI
 CLAUDE.md
 .bmad-code/*
-.claude/
+.claude/*
+.claude-trace/*
 # AI model files
 # (if you have specific AI model files, you can add them here)
+
 # Build artifacts
 dist/
 # Node modules
