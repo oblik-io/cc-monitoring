@@ -1,0 +1,215 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop, 'feature/*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            container_runtime: docker
+          - os: macos-latest
+            container_runtime: docker
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    # Install dependencies based on OS
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bats shellcheck
+        pip install yamllint
+        
+        # Install kcov for coverage
+        sudo apt-get install -y cmake binutils-dev libcurl4-openssl-dev zlib1g-dev libdw-dev libiberty-dev
+        git clone https://github.com/SimonKagstrom/kcov.git /tmp/kcov
+        cd /tmp/kcov
+        mkdir build
+        cd build
+        cmake ..
+        make
+        sudo make install
+
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install bats-core shellcheck
+        pip install yamllint
+        
+        # Note: kcov is complex to build on macOS, skip for now
+        echo "Coverage analysis not available on macOS CI"
+
+    # Verify installations
+    - name: Verify dependencies
+      run: |
+        echo "BATS version:"
+        bats --version
+        echo "ShellCheck version:"
+        shellcheck --version
+        echo "yamllint version:"
+        yamllint --version
+        echo "Docker version:"
+        docker --version || echo "Docker not available"
+        echo "Docker Compose version:"
+        docker compose version || docker-compose --version || echo "Docker Compose not available"
+
+    # Run linting first (fail fast)
+    - name: Run ShellCheck
+      run: |
+        shellcheck -e SC1091 manage.sh check-claude-metrics.sh update-wsl-ip.sh test-runner.sh
+
+    - name: Run yamllint
+      run: |
+        yamllint -d relaxed docker-compose.yaml
+        yamllint -d relaxed prometheus.yml.template || true
+        yamllint -d relaxed grafana-provisioning/datasources/prometheus.yml.template || true
+        yamllint -d relaxed grafana-provisioning/dashboards/dashboard.yml || true
+
+    # Run unit tests
+    - name: Run BATS unit tests
+      run: |
+        ./test-runner.sh --unit-only --verbose
+
+    # Run full test suite
+    - name: Run complete test suite
+      run: |
+        ./test-runner.sh --verbose
+
+    # Upload test results
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report-${{ matrix.os }}
+        path: test-report.txt
+
+    # Upload coverage reports (Ubuntu only)
+    - name: Upload coverage reports
+      if: matrix.os == 'ubuntu-latest' && always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/
+
+  docker-test:
+    name: Docker Integration Test
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Test Docker Compose setup
+      run: |
+        # Test configuration generation
+        ./manage.sh configure
+        
+        # Verify generated files
+        test -f prometheus.yml
+        test -f grafana-provisioning/datasources/prometheus.yml
+        
+        # Test Docker Compose validation
+        docker compose config
+
+    - name: Test container startup
+      run: |
+        # Start containers
+        ./manage.sh up -d
+        
+        # Wait for services to be ready
+        sleep 30
+        
+        # Check container status
+        ./manage.sh ps
+        
+        # Test Prometheus endpoint
+        curl -f http://localhost:9090/-/ready || exit 1
+        
+        # Test Grafana endpoint
+        curl -f http://localhost:3000/api/health || exit 1
+        
+        # Clean up
+        ./manage.sh down
+
+  podman-test:
+    name: Podman Integration Test
+    runs-on: ubuntu-latest
+    needs: test
+    continue-on-error: true  # Podman tests are optional
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install podman podman-compose
+
+    - name: Test Podman setup
+      run: |
+        # Force Podman mode
+        export FORCE_PODMAN=true
+        
+        # Test configuration generation
+        ./manage.sh configure
+        
+        # Test pod creation
+        ./manage.sh up -d
+        
+        # Wait for services
+        sleep 30
+        
+        # Check pod status
+        ./manage.sh ps
+        
+        # Clean up
+        ./manage.sh down
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'

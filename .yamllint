@@ -1,0 +1,52 @@
+---
+# Claude Code Monitoring - yamllint configuration
+
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  
+  comments:
+    min-spaces-from-content: 1
+  
+  indentation:
+    spaces: 2
+    indent-sequences: true
+  
+  truthy:
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
+  
+  # Allow both key: value and key:value styles
+  colons:
+    max-spaces-after: 1
+    max-spaces-before: 0
+  
+  # Be lenient with empty lines
+  empty-lines:
+    max: 2
+    max-start: 1
+    max-end: 1
+  
+  # Allow brackets on same line
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  
+  # Disable some overly strict rules for CI files
+  document-start:
+    present: false
+  
+  quoted-strings:
+    quote-type: any
+    required: only-when-needed
+
+# Ignore certain paths
+ignore: |
+  .git/
+  node_modules/
+  coverage/
+  build/
+  dist/
+  vendor/

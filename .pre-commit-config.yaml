@@ -1,0 +1,75 @@
+# Claude Code Monitoring - Pre-commit Configuration
+# =================================================
+
+repos:
+  # Shell script checks
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: [-e, SC1091]
+        files: \.(sh|bash)$
+        exclude: ^(coverage|build|dist)/
+
+  # YAML checks
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed]
+        files: \.(yml|yaml)$
+        exclude: ^(coverage|build|dist)/
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^grafana-provisioning/dashboards/.*\.json$
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # JSON checks (for Grafana dashboards)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-json
+        files: \.json$
+
+  # Markdown checks
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        files: \.md$
+
+  # Custom local checks
+  - repo: local
+    hooks:
+      - id: bats-tests
+        name: Run BATS tests
+        entry: bash -c 'if command -v bats >/dev/null 2>&1; then ./test-runner.sh --unit-only; else echo "BATS not installed, skipping tests"; fi'
+        language: system
+        pass_filenames: false
+        files: \.(sh|bats)$
+        
+      - id: validate-docker-compose
+        name: Validate docker-compose.yaml
+        entry: bash -c 'if command -v docker >/dev/null 2>&1; then docker compose config >/dev/null; else echo "Docker not available, skipping"; fi'
+        language: system
+        pass_filenames: false
+        files: docker-compose\.yaml$
+
+# Configuration
+default_stages: [commit]
+fail_fast: false
+minimum_pre_commit_version: '2.20.0'
